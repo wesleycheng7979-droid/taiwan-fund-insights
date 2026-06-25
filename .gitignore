@@ -1,0 +1,8 @@
+# Local scratch and system files
+scratch/
+.system_generated/
+.agents/
+__pycache__/
+*.log
+.DS_Store
+Thumbs.db

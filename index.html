@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="每日更新台灣共同基金與境外基金前 100 名績效排行榜，支援多天期報酬率排序、基金類型篩選、搜尋及夏普值、波動度等風險指標查詢。">
+    <title>台灣基金前 100 名績效看板 | Taiwan Fund Insights</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>Taiwan Fund Insights</h1>
+                    <span>台灣基金績效看板</span>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18">
+                        <path fill="none" stroke="currentColor" stroke-width="2" d="M15 15l6 6m-3-9a6 6 0 11-12 0 6 6 0 0112 0z"/>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="搜尋基金代號或名稱...">
+                </div>
+                
+                <button id="themeToggle" class="theme-toggle-btn" aria-label="切換深淺色模式">
+                    <svg class="sun-icon" viewBox="0 0 24 24" width="20" height="20">
+                        <circle cx="12" cy="12" r="5" fill="currentColor"/>
+                        <path stroke="currentColor" stroke-width="2" d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.04 5.96l1.42-1.42"/>
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a7 7 0 11-7.54-7.54c.44-.06.9-.1 1.36-.1z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Top Performers (Podium / Cards) -->
+        <section class="podium-section">
+            <h2 class="section-title">今日焦點：績效前三強</h2>
+            <div class="podium-container" id="podiumContainer">
+                <!-- Top 3 cards will be inserted here dynamically -->
+                <div class="podium-card-skeleton"></div>
+                <div class="podium-card-skeleton"></div>
+                <div class="podium-card-skeleton"></div>
+            </div>
+        </section>
+
+        <!-- Dashboard Controls -->
+        <section class="controls-section">
+            <div class="tabs-wrapper">
+                <div class="scope-tabs">
+                    <button class="tab-btn active" data-scope="all" id="scopeAllTab">全部基金</button>
+                    <button class="tab-btn" data-scope="境內" id="scopeDomesticTab">境內基金</button>
+                    <button class="tab-btn" data-scope="境外" id="scopeOffshoreTab">境外基金</button>
+                </div>
+            </div>
+
+            <div class="filters-wrapper">
+                <div class="filter-group">
+                    <label for="typeFilter">類型：</label>
+                    <select id="typeFilter">
+                        <option value="all">全部類型</option>
+                        <option value="股票型">股票型</option>
+                        <option value="債券型">債券型</option>
+                        <option value="平衡型">平衡型</option>
+                        <option value="貨幣型">貨幣型</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="ccyFilter">計價幣別：</label>
+                    <select id="ccyFilter">
+                        <option value="all">全部幣別</option>
+                        <option value="台幣">新台幣 (TWD)</option>
+                        <option value="美元">美元 (USD)</option>
+                        <option value="人民幣">人民幣 (CNY)</option>
+                        <option value="歐元">歐元 (EUR)</option>
+                        <option value="南非幣">南非幣 (ZAR)</option>
+                        <option value="澳幣">澳幣 (AUD)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="period-selector-wrapper">
+                <span class="period-label">績效天期：</span>
+                <div class="period-buttons">
+                    <button class="period-btn" data-period="r1M">近 1 個月</button>
+                    <button class="period-btn" data-period="r3M">近 3 個月</button>
+                    <button class="period-btn" data-period="r6M">近 6 個月</button>
+                    <button class="period-btn" data-period="rYTD">今年以來</button>
+                    <button class="period-btn active" data-period="r1Y">近 1 年</button>
+                    <button class="period-btn" data-period="r2Y">近 2 年</button>
+                    <button class="period-btn" data-period="r3Y">近 3 年</button>
+                    <button class="period-btn" data-period="r5Y">近 5 年</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Data Table -->
+        <main class="table-section">
+            <div class="table-header-info">
+                <span class="rank-count-text">前 100 名基金列表</span>
+                <span class="update-time-text" id="updateTimeText">資料更新中...</span>
+            </div>
+            
+            <div class="table-responsive-container">
+                <table class="fund-table" id="fundTable">
+                    <thead>
+                        <tr>
+                            <th class="col-rank">排名</th>
+                            <th class="col-name text-left">基金名稱</th>
+                            <th class="col-type">類型</th>
+                            <th class="col-ccy">幣別</th>
+                            <th class="col-nav text-right">最新淨值</th>
+                            <th class="col-change text-right">單日漲跌</th>
+                            <th class="col-sharpe text-right">夏普值 (1年)</th>
+                            <th class="col-vol text-right">年化波動度</th>
+                            <th class="col-return text-right active" id="periodColHeader">近 1 年報酬率</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fundTableBody">
+                        <!-- Table rows will be dynamically populated -->
+                        <tr class="table-loading-row">
+                            <td colspan="9">
+                                <div class="loading-spinner-container">
+                                    <div class="spinner"></div>
+                                    <span>正在載入並分析基金绩效數據...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- Footer / Disclaimers -->
+        <footer class="main-footer">
+            <p>© 2026 Taiwan Fund Insights. 資料介接自鉅亨買基金，每日定期更新。</p>
+            <p class="disclaimer">理財聲明：本看板提供之基金歷史績效數據僅供參考，不代表未來績效保證。投資人申購前應詳閱各基金公開說明書，評估自身風險承受能力。</p>
+        </footer>
+
+        <!-- Fund Details Modal -->
+        <div id="fundModal" class="modal-overlay">
+            <div class="modal-card">
+                <header class="modal-header">
+                    <div class="modal-header-title">
+                        <span class="modal-fund-id" id="modalFundID">A36004</span>
+                        <h3 id="modalFundName">安聯台灣科技基金</h3>
+                    </div>
+                    <button id="modalCloseBtn" class="modal-close-btn" aria-label="關閉">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </header>
+                
+                <div class="modal-content">
+                    <div class="modal-stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-label">最新淨值</span>
+                            <span class="stat-value" id="modalNAV">861.27</span>
+                            <span class="stat-sub" id="modalNAVDate">2026-06-24</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">單日漲跌</span>
+                            <span class="stat-value" id="modalChange">+0.10%</span>
+                            <span class="stat-sub">NAV 異動</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">風險評級</span>
+                            <span class="stat-value text-accent" id="modalRisk">RR5</span>
+                            <span class="stat-sub">風險回報等級</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">夏普值 (1年)</span>
+                            <span class="stat-value" id="modalSharpe">1.30</span>
+                            <span class="stat-sub">超額報酬指標</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-charts-section">
+                        <div class="chart-container">
+                            <h4>多天期績效回報 (%)</h4>
+                            <div class="return-bars-container" id="modalReturnBars">
+                                <!-- Dynamic return bars -->
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <h4>歷年曆年報酬率 (Calendar Year ROI)</h4>
+                            <div class="canvas-wrapper">
+                                <canvas id="roiChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-info-details">
+                        <div class="info-row">
+                            <span class="info-label">基金類型</span>
+                            <span class="info-value" id="modalGroup">股票型</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">計價幣別</span>
+                            <span class="info-value" id="modalCcy">台幣</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">成立日期</span>
+                            <span class="info-value" id="modalSetupDate">2001-04-03</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">年化波動度 (1年)</span>
+                            <span class="info-value" id="modalVol">35.81%</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Lipper 分類</span>
+                            <span class="info-value" id="modalLipper">台灣股票</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">基金規模</span>
+                            <span class="info-value" id="modalSize">約 2,072 億元 (TWD)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <footer class="modal-footer">
+                    <a id="modalBuyLink" href="#" target="_blank" class="buy-button">
+                        前往鉅亨申購 / 查看詳情
+                        <svg viewBox="0 0 24 24" width="18" height="18" style="margin-left: 6px;">
+                            <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+                        </svg>
+                    </a>
+                </footer>
+            </div>
+        </div>
+
+    </div>
+    
+    <!-- Custom Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
