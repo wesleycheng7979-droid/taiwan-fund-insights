@@ -1,5 +1,5 @@
 {
-  "updateTime": "2026-11-21 20:19:13",
+  "updateTime": "2026-11-22 20:31:56",
   "totalCount": 4547,
   "funds": [
     {
@@ -133343,7 +133343,7 @@
       "riskReturnRating": "RR5",
       "sharpe1Y": -6.211858,
       "stdDev1Y": 0.0,
-      "lipperCategory": "環球收益股票",
+      "lipperCategory": "環球新興市場當地貨幣債券",
       "setupDate": "2006-05-16",
       "assetsTWD_B": 0.0,
       "yearROI1": null,
@@ -136043,7 +136043,7 @@
       "riskReturnRating": "RR5",
       "sharpe1Y": -0.27424,
       "stdDev1Y": 38.6253221,
-      "lipperCategory": "環球新興市場股票",
+      "lipperCategory": "新台幣靈活混合型",
       "setupDate": "2007-12-17",
       "assetsTWD_B": 0.0,
       "yearROI1": null,
